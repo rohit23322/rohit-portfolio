@@ -1,22 +1,167 @@
-// ================================
-// Smooth scrolling
-// ================================
+// ==========================================
+// PORTFOLIO JAVASCRIPT
+// ==========================================
 
-document.querySelectorAll('a[href^="#"]').forEach(function (link) {
 
-    link.addEventListener("click", function (event) {
+// ==========================================
+// FORMINIT CONTACT FORM
+// ==========================================
 
-        const target = document.querySelector(
-            this.getAttribute("href")
-        );
+const forminit = new Forminit();
 
-        if (target) {
+// Your Forminit Form ID
+const FORM_ID = "805mzykh4q3";
 
-            event.preventDefault();
 
-            target.scrollIntoView({
-                behavior: "smooth"
-            });
+// Get contact form
+const contactForm = document.getElementById("contact-form");
+
+// Get status message
+const formStatus = document.getElementById("form-status");
+
+
+// Check if contact form exists
+if (contactForm) {
+
+    contactForm.addEventListener("submit", async function (e) {
+
+        // Prevent normal page refresh
+        e.preventDefault();
+
+
+        // Get submit button
+        const submitButton =
+            contactForm.querySelector('button[type="submit"]');
+
+
+        // Show sending message
+        formStatus.textContent = "Sending message...";
+
+
+        // Disable button
+        submitButton.disabled = true;
+
+
+        // Change button text
+        submitButton.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+
+        // Create FormData
+        const formData = new FormData(contactForm);
+
+
+        try {
+
+            // Send form to Forminit
+            const { data, error } =
+                await forminit.submit(
+                    FORM_ID,
+                    formData
+                );
+
+
+            // Check for error
+            if (error) {
+
+                console.error("Forminit Error:", error);
+
+                formStatus.textContent =
+                    "Failed to send message. Please try again.";
+
+                submitButton.disabled = false;
+
+                submitButton.innerHTML =
+                    '<i class="fa-solid fa-paper-plane"></i> Send Message';
+
+                return;
+            }
+
+
+            // ==========================================
+            // SUCCESS
+            // ==========================================
+
+            formStatus.textContent =
+                "Message sent successfully! Thank you for contacting me.";
+
+
+            // Clear form
+            contactForm.reset();
+
+
+            // Enable button
+            submitButton.disabled = false;
+
+
+            // Restore button
+            submitButton.innerHTML =
+                '<i class="fa-solid fa-paper-plane"></i> Send Message';
+
+
+        } catch (error) {
+
+            // ==========================================
+            // ERROR
+            // ==========================================
+
+            console.error("Error:", error);
+
+
+            formStatus.textContent =
+                "Something went wrong. Please try again.";
+
+
+            // Enable button
+            submitButton.disabled = false;
+
+
+            // Restore button
+            submitButton.innerHTML =
+                '<i class="fa-solid fa-paper-plane"></i> Send Message';
+
+        }
+
+    });
+
+}
+
+
+// ==========================================
+// SMOOTH SCROLLING
+// ==========================================
+
+const navigationLinks =
+    document.querySelectorAll(".nav-links a");
+
+
+navigationLinks.forEach(function (link) {
+
+    link.addEventListener("click", function (e) {
+
+        const targetId =
+            this.getAttribute("href");
+
+
+        if (
+            targetId &&
+            targetId.startsWith("#")
+        ) {
+
+            e.preventDefault();
+
+
+            const targetSection =
+                document.querySelector(targetId);
+
+
+            if (targetSection) {
+
+                targetSection.scrollIntoView({
+                    behavior: "smooth"
+                });
+
+            }
 
         }
 
@@ -25,48 +170,156 @@ document.querySelectorAll('a[href^="#"]').forEach(function (link) {
 });
 
 
-// ================================
-// Scroll animation
-// ================================
+// ==========================================
+// ACTIVE NAVIGATION LINK
+// ==========================================
 
-const cards = document.querySelectorAll(
-    ".project-card, .skill-card, .education-card, .soft-skills div"
+const sections =
+    document.querySelectorAll("section[id]");
+
+
+const navLinks =
+    document.querySelectorAll(".nav-links a");
+
+
+window.addEventListener("scroll", function () {
+
+    let currentSection = "";
+
+
+    sections.forEach(function (section) {
+
+        const sectionTop =
+            section.offsetTop - 150;
+
+        const sectionHeight =
+            section.clientHeight;
+
+        if (
+            window.scrollY >= sectionTop &&
+            window.scrollY < sectionTop + sectionHeight
+        ) {
+
+            currentSection =
+                section.getAttribute("id");
+
+        }
+
+    });
+
+
+    navLinks.forEach(function (link) {
+
+        link.classList.remove("active");
+
+
+        if (
+            link.getAttribute("href") ===
+            "#" + currentSection
+        ) {
+
+            link.classList.add("active");
+
+        }
+
+    });
+
+});
+
+
+// ==========================================
+// SCROLL TO TOP BUTTON
+// ==========================================
+
+const scrollTopButton =
+    document.createElement("button");
+
+
+scrollTopButton.innerHTML =
+    '<i class="fa-solid fa-arrow-up"></i>';
+
+
+scrollTopButton.className =
+    "scroll-top";
+
+
+scrollTopButton.setAttribute(
+    "aria-label",
+    "Scroll to top"
 );
 
 
-const observer = new IntersectionObserver(
-    function (entries) {
+// Add button to page
+document.body.appendChild(scrollTopButton);
 
-        entries.forEach(function (entry) {
 
-            if (entry.isIntersecting) {
+// Show/hide scroll button
+window.addEventListener("scroll", function () {
 
-                entry.target.style.opacity = "1";
+    if (window.scrollY > 400) {
 
-                entry.target.style.transform =
-                    "translateY(0)";
+        scrollTopButton.classList.add("show");
 
-            }
+    } else {
 
+        scrollTopButton.classList.remove("show");
+
+    }
+
+});
+
+
+// Scroll to top
+scrollTopButton.addEventListener(
+    "click",
+    function () {
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
         });
 
-    },
-    {
-        threshold: 0.15
     }
 );
 
 
-cards.forEach(function (card) {
+// ==========================================
+// BUTTON RIPPLE EFFECT
+// ==========================================
 
-    card.style.opacity = "0";
+const buttons =
+    document.querySelectorAll(".btn, .send-btn");
 
-    card.style.transform =
-        "translateY(30px)";
 
-    card.style.transition =
-        "all 0.6s ease";
+buttons.forEach(function (button) {
 
-    observer.observe(card);
+    button.addEventListener("click", function () {
+
+        this.classList.add("clicked");
+
+
+        setTimeout(() => {
+
+            this.classList.remove("clicked");
+
+        }, 300);
+
+    });
 
 });
+
+
+// ==========================================
+// PAGE LOADED
+// ==========================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        console.log(
+            "Portfolio website loaded successfully."
+        );
+
+    }
+);
